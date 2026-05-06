@@ -3,7 +3,7 @@ from datetime import datetime
 
 API_URL = "http://20.207.122.201/evaluation-service/notifications"
 TOP_N = 10
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiYXVkIjoiaHR0cDovLzIwLjI0NC41Ni4xNDQvZXZhbHVhdGlvbi1zZXJ2aWNlIiwiZW1haWwiOiJ2ZWxhbWFsYXBhdmFua3Jpc2huYUBnbWFpbC5jb20iLCJleHAiOjE3NzgwNjM4MDMsImlhdCI6MTc3ODA2MjkwMywiaXNzIjoiQWZmb3JkIE1lZGljYWwgVGVjaG5vbG9naWVzIFByaXZhdGUgTGltaXRlZCIsImp0aSI6ImJhYWNkMDMyLWM4MjUtNGJjYS04NzRkLTQ0ZTgwN2I4MzNjMCIsImxvY2FsZSI6ImVuLUlOIiwibmFtZSI6InZlbGFtYWxhIHBhdmFuIGtyaXNobmEiLCJzdWIiOiIxMDkwZjRmZS1jOTJkLTQwOTUtOTcyMC1lOWVmNWQwMjhjNTQifSwiZW1haWwiOiJ2ZWxhbWFsYXBhdmFua3Jpc2huYUBnbWFpbC5jb20iLCJuYW1lIjoidmVsYW1hbGEgcGF2YW4ga3Jpc2huYSIsInJvbGxObyI6ImFtLnNjLnU0YWllMjMwNjMiLCJhY2Nlc3NDb2RlIjoiUFRCTW1RIiwiY2xpZW50SUQiOiIxMDkwZjRmZS1jOTJkLTQwOTUtOTcyMC1lOWVmNWQwMjhjNTQiLCJjbGllbnRTZWNyZXQiOiJ0WUJDYlpEa0pRSEVHalJEIn0.17N35s16OI6o8igIY-yc23Tp2QYjn5iYLbA3fH2SB7A"
+TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiYXVkIjoiaHR0cDovLzIwLjI0NC41Ni4xNDQvZXZhbHVhdGlvbi1zZXJ2aWNlIiwiZW1haWwiOiJ2ZWxhbWFsYXBhdmFua3Jpc2huYUBnbWFpbC5jb20iLCJleHAiOjE3NzgwNjQ5NTAsImlhdCI6MTc3ODA2NDA1MCwiaXNzIjoiQWZmb3JkIE1lZGljYWwgVGVjaG5vbG9naWVzIFByaXZhdGUgTGltaXRlZCIsImp0aSI6IjU2NjJjZTBhLWNhMTgtNDhmYy1iZDFlLTg0MWE2ZDNhMGI5NiIsImxvY2FsZSI6ImVuLUlOIiwibmFtZSI6InZlbGFtYWxhIHBhdmFuIGtyaXNobmEiLCJzdWIiOiIxMDkwZjRmZS1jOTJkLTQwOTUtOTcyMC1lOWVmNWQwMjhjNTQifSwiZW1haWwiOiJ2ZWxhbWFsYXBhdmFua3Jpc2huYUBnbWFpbC5jb20iLCJuYW1lIjoidmVsYW1hbGEgcGF2YW4ga3Jpc2huYSIsInJvbGxObyI6ImFtLnNjLnU0YWllMjMwNjMiLCJhY2Nlc3NDb2RlIjoiUFRCTW1RIiwiY2xpZW50SUQiOiIxMDkwZjRmZS1jOTJkLTQwOTUtOTcyMC1lOWVmNWQwMjhjNTQiLCJjbGllbnRTZWNyZXQiOiJ0WUJDYlpEa0pRSEVHalJEIn0.ZJ7CkspHtVsN0ingOiZhvLMQYmxXtK5Sq58_GyHwFVI"
 TYPE_WEIGHTS = {
     "Placement": 3,
     "Result": 2,
@@ -35,13 +35,13 @@ def calculate_priority(notification):
 
     timestamp = notification["Timestamp"]
 
-    # Type weight
+    # Strong type priority
     type_score = TYPE_WEIGHTS.get(
         notification_type,
         0
-    ) * 100
+    ) * 100000
 
-    # Timestamp conversion
+    # Convert timestamp
     notification_time = datetime.strptime(
         timestamp,
         "%Y-%m-%d %H:%M:%S"
@@ -49,14 +49,15 @@ def calculate_priority(notification):
 
     current_time = datetime.now()
 
-    # Recent notifications get higher score
+    # Recent notifications get bonus
     time_difference = (
         current_time - notification_time
     ).total_seconds()
 
+    # Smaller time difference = larger bonus
     recency_bonus = max(
         0,
-        100000 - int(time_difference)
+        50000 - int(time_difference)
     )
 
     total_score = (
